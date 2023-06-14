@@ -1,0 +1,31 @@
+# Создадим контейнер для Kerberos
+dn: cn=kerberos,ou=services,dc=example,dc=org
+cn: kerberos
+objectClass: top
+objectClass: krbContainer
+
+# Добавим группу krbadmin
+dn: cn=krbadmin,ou=groups,dc=example,dc=org
+objectClass: top
+objectClass: posixGroup
+cn: krbadmin
+gidNumber: 800
+description: Kerberos administrator's group.
+
+# Добавим пользователя krbadmin
+dn: cn=krbadmin,ou=users,dc=example,dc=org
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: posixAccount
+objectClass: top
+cn: krbadmin
+givenName: Kerberos Administrator
+mail: kerberos.admin@example.org
+sn: krbadmin
+uid: krbadmin
+uidNumber: 800
+gidNumber: 800
+homeDirectory: /home/krbadmin
+loginShell: /bin/false
+displayname: Kerberos Administrator

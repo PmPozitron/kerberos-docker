@@ -1,0 +1,57 @@
+после установки krb5-user & krb5-config
+(+ openssh-client, но хз зачем я его ставил; + sudo apt-get install -y libsasl2-modules-gssapi-mit, тоже хз надо ли, в одном гайде упомянут)
+(+ slapd ldap-utils, the admin password for your LDAP directory - adminpassword)
+на openldap тачку создаём принципала, добавляем его в кейтаб, копируем кейтаб на опенлдап тачку вместе с клиентской конфой:
+
+kadmin.local
+add_principal -randkey host/openldap.example.com@EXAMPLE.COM
+ktadd -k /etc/krb5-service.keytab -norandkey host/openldap.example.com@EXAMPLE.COM (norandkey ?)
+docker cp krb5-kdc-server-example-com:/etc/krb5-service.keytab ./.build-example-com/krb5-service.keytab
+docker cp ./.build-example-com/wldap-krb5-service.keytab opendlap:/etc/wldap-krb5-service.keytab
+docker cp ./.build-example-com/services/krb5/client/krb5.conf openldap:/etc/krb5.conf
+
+gssapi конфа (нужно подправить keytab, т.к. я юзаю не бобовский, а сервисный):
+docker cp ./gssapi-java/gss-server/config/jaas-krb5.conf krb5-kdc-server-example-com:/root/jaas-krb5.conf (? тут это вообще надо)
+docker cp ./gssapi-java/gss-client/config/jaas-krb5.conf openldap:/root/jaas-krb5.conf (? может из gss-server)
+docker cp ./gssapi-java/gss-server/config/jaas-krb5.conf openldap:/root/jaas-krb5.conf (? может из gss-server)
+
+
+короче, это всё может оказаться и не нужным, т.к. относится с конфигурации, где ldap исп-ся как БД кербероса
+===================
+оказывается, нужен ещё и пакет krb5-kdc-ldap + schema2ldif (поставил на тачку с kdc; добавил ещё и на лдапную)
+https://ubuntu.com/server/docs/service-kerberos-with-openldap-backend
+
+пришлось перезапускать контейнер пробрасывая --env LDAP_BIND_DN=cn=config,dc=example,dc=org
+по дефолту битнами/опенлдап запускается с cn=admin, а из-за этого не импортится схема в "sudo ldap-schema-manager -i kerberos.schema"
+после успешного перезапуска вызов ldapsearch -Y EXTERNAL -H ldapi:// -b cn=config должен выдать несколько мониторов текста (и result: 0 Success),
+а не просто заглушку "result: 32 No such object"
+плюс там какой-то замут с юзерами, под рутом не выдаётся ничерта в ldapsearch -Y EXTERNAL -H ldapi:// -b cn=config, а не под рутом при импорте вылезает ошибка "нужен рут"
+обновил рутовый пароль на Changeme_1234 на лдап тачке.
+
+задолбавшись с трансформацией .schema -> .ldif при помощи тулз, просто взял его отсюда
+https://github.com/krb5/krb5/blob/master/src/plugins/kdb/ldap/libkdb_ldap/kerberos.openldap.ldif
+ldapadd -QY EXTERNAL -H ldapi:/// -D cn=config,dc=example,dc=org -f /etc/ldap/schema/kerberos.ldif (?)
+тест:
+I have no name!@openldap:/home/empty$ ldapsearch -QLLLY EXTERNAL -H ldapi:/// -b cn=schema,cn=config dn | grep -i kerberos
+dn: cn={4}kerberos,cn=schema,cn=config
++
+I have no name!@openldap:/home/empty$ ldapsearch -QLLLY EXTERNAL -H ldapi:/// -b cn={4}kerberos,cn=schema,cn=config | grep NAME | cut -d' ' -f5 | sort
+'krbAdmServers'
+'krbAdmService'
+'krbAllowedToDelegateTo'
+---
+ldapadd -xZZWD cn=admin,dc=example,dc=org -QY EXTERNAL -H ldapi:/// -f /home/krb5-container.ldif
+===================
+
+
+
+docker run --name openldap --network example.com --hostname openldap --env LDAP_BIND_DN=cn=config,dc=example,dc=org -p 1389:1389 -p 1636:1636 bitnami/openldap-mod
+
+docker cp krb5-kdc-server-example-com:/etc/ldap/schema/kerberos.schema /mnt/d/dbg/kerberos-docker/
+docker cp /mnt/d/dbg/kerberos-docker/ openldap:/etc/ldap/schema/
+
+docker cp ./script/schema-2-ldif.sh openldap:~
+
+D:/dbg/kerberos-docker/gssapi-java/gss-client/config/jaas-krb5.conf
+D:/dbg/kerberos-docker/gssapi-java/gss-client/src/main/java/com/criteo/gsscli/krb5-local.conf
+D:/dbg/kerberos-docker/.build-example-com/bob.keytab
