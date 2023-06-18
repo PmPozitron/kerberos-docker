@@ -1,0 +1,116 @@
+{
+  "ldap/localhost@EXAMPLE.COM": {
+    "principal": "ldap/localhost@EXAMPLE.COM",
+    "keyVersion": 1,
+    "kdcFlags": 0,
+    "disabled": false,
+    "locked": false,
+    "expireTime": "253402300799900",
+    "createdTime": "1687010568393",
+    "keys": {
+      "AES128_CTS_HMAC_SHA1_96": {
+        "kvno": 1,
+        "key": "3019A003020111A1120410476ECF6630A4C633E7F0FB8721AE128C"
+      },
+      "DES3_CBC_SHA1": {
+        "kvno": 1,
+        "key": "3021A003020110A11A0418EF7346405ECD64E58F2016E66D6BCDE320943D15FD94AE57"
+      }
+    }
+  },
+  "krbtgt/EXAMPLE.COM@EXAMPLE.COM": {
+    "principal": "krbtgt/EXAMPLE.COM@EXAMPLE.COM",
+    "keyVersion": 1,
+    "kdcFlags": 0,
+    "disabled": false,
+    "locked": false,
+    "expireTime": "253402300799900",
+    "createdTime": "1686998106096",
+    "keys": {
+      "AES128_CTS_HMAC_SHA1_96": {
+        "kvno": 1,
+        "key": "3019A003020111A11204107DE60BF4EF544F13347C37678A52A90D"
+      },
+      "DES3_CBC_SHA1": {
+        "kvno": 1,
+        "key": "3021A003020110A11A0418F876540ED9B53845DF6702EA5791FDBAFDBFC4D5A885E6A7"
+      }
+    }
+  },
+  "null/localhost@EXAMPLE.COM": {
+    "principal": "null/localhost@EXAMPLE.COM",
+    "keyVersion": 1,
+    "kdcFlags": 0,
+    "disabled": false,
+    "locked": false,
+    "expireTime": "253402300799900",
+    "createdTime": "1686998106282",
+    "keys": {
+      "AES128_CTS_HMAC_SHA1_96": {
+        "kvno": 1,
+        "key": "3019A003020111A1120410C6E5555D38C6EFA328D75730B772621F"
+      },
+      "DES3_CBC_SHA1": {
+        "kvno": 1,
+        "key": "3021A003020110A11A0418F7AD13CB5DF1498CD962CB2AABD0C89D948C91D3468526C8"
+      }
+    }
+  },
+  "kadmin/EXAMPLE.COM@EXAMPLE.COM": {
+    "principal": "kadmin/EXAMPLE.COM@EXAMPLE.COM",
+    "keyVersion": 1,
+    "kdcFlags": 0,
+    "disabled": false,
+    "locked": false,
+    "expireTime": "253402300799900",
+    "createdTime": "1686998106273",
+    "keys": {
+      "AES128_CTS_HMAC_SHA1_96": {
+        "kvno": 1,
+        "key": "3019A003020111A1120410F6338A1E76BF6AB13D8D8F428F5C455D"
+      },
+      "DES3_CBC_SHA1": {
+        "kvno": 1,
+        "key": "3021A003020110A11A0418C2207F6B8A5E85AEB57045EAE6A45810BC8080974CEAC1F1"
+      }
+    }
+  },
+  "pmp@EXAMPLE.COM": {
+    "principal": "pmp@EXAMPLE.COM",
+    "keyVersion": 1,
+    "kdcFlags": 0,
+    "disabled": false,
+    "locked": false,
+    "expireTime": "253402300799900",
+    "createdTime": "1686998945048",
+    "keys": {
+      "AES128_CTS_HMAC_SHA1_96": {
+        "kvno": 1,
+        "key": "3019A003020111A1120410026253362CF82C2951D8E8ED855BE902"
+      },
+      "DES3_CBC_SHA1": {
+        "kvno": 1,
+        "key": "3021A003020110A11A04186D2AB051FEBF49D90EB3A8BC2A2A0D68C4949B946E983D40"
+      }
+    }
+  },
+  "ldap/desktop-9vij310@EXAMPLE.COM": {
+    "principal": "ldap/desktop-9vij310@EXAMPLE.COM",
+    "keyVersion": 1,
+    "kdcFlags": 0,
+    "disabled": false,
+    "locked": false,
+    "expireTime": "253402300799900",
+    "createdTime": "1687003067042",
+    "keys": {
+      "AES128_CTS_HMAC_SHA1_96": {
+        "kvno": 1,
+        "key": "3019A003020111A1120410F724D406DFC8E618C6FCBFCDBF691F50"
+      },
+      "DES3_CBC_SHA1": {
+        "kvno": 1,
+        "key": "3021A003020110A11A041825574C5B85A8ABB5A22045C7491008575170FEC8980D5EFD"
+      }
+    }
+  }
+}

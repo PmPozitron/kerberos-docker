@@ -1,0 +1,23 @@
+dn: uid=ldap,ou=services,dc=security,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+objectClass: krb5KDCEntry
+objectClass: uidObject
+objectClass: krb5Principal
+krb5KeyVersionNumber: 0
+krb5PrincipalName: ldap/desktop-9vij310@EXAMPLE.COM
+uid: ldap
+userPassword: secret
+ou: TGT
+
+dn: uid=krbtgt,ou=services,dc=security,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+objectClass: krb5KDCEntry
+objectClass: uidObject
+objectClass: krb5Principal
+krb5KeyVersionNumber: 0
+krb5PrincipalName: krbtgt/EXAMPLE.COM@EXAMPLE.COM
+uid: krbtgt
+userPassword:: secret
+ou: LDAP

@@ -1,0 +1,15 @@
+dn: dc=security,dc=example,dc=com
+objectClass: top
+objectClass: domain
+dc: security
+
+dn: ou=services,dc=security,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: services
+
+dn: ou=users,dc=security,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+ou: users
