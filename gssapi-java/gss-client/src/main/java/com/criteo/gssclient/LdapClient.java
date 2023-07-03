@@ -206,7 +206,7 @@ class CustomLoginConfiguration extends Configuration {
 //        options.put( "useKeyTab", "true" );
 //        options.put( "keyTab", "D:/dbg/kerberos-docker-fork/gssapi-java/gss-client/config/pmp.keytab" );
         options.put("storeKey", "false");
-        options.put("callbackHandler", new CustomCallBackHandler());
+//        options.put("callbackHandler", new CustomCallBackHandler());
 
 //        options.put("krb5ConfFilePath", "D:/dbg/kerberos-docker-fork/gssapi-java/gss-client/config/krb5.conf");
 
@@ -240,51 +240,5 @@ class CustomLoginConfiguration extends Configuration {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .toString();
-    }
-}
-
-class CustomCallBackHandler implements CallbackHandler {
-    String name = "pmp@EXAMPLE.COM";
-    String pass = "secret";
-    String realm = "EXAMPLE.COM";
-    @Override
-    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-
-        for (Callback cb : callbacks) {
-            if (cb instanceof NameCallback) {
-                NameCallback ncb = (NameCallback) cb;
-                ncb.setName(name);
-            } else if (cb instanceof PasswordCallback) {
-                PasswordCallback pcb = (PasswordCallback) cb;
-                pcb.setPassword(Strings.utf8ToString(pass.getBytes()).toCharArray());
-            } else if (cb instanceof RealmCallback) {
-                RealmCallback rcb = (RealmCallback) cb;
-
-                if (realm != null) {
-                    rcb.setText(realm);
-                } else {
-                    rcb.setText(rcb.getDefaultText());
-                }
-            } else if (cb instanceof RealmChoiceCallback) {
-                RealmChoiceCallback rccb = (RealmChoiceCallback) cb;
-
-                boolean foundRealmName = false;
-
-                String[] realmNames = rccb.getChoices();
-                for (int i = 0; i < realmNames.length; i++) {
-                    String realmName = realmNames[i];
-                    if (realmName.equals(realm)) {
-                        foundRealmName = true;
-                        rccb.setSelectedIndex(i);
-                        break;
-                    }
-                }
-
-                if (!foundRealmName) {
-                    throw new IOException(I18n.err(I18n.ERR_04171_CANNOT_PARSE_MATCHED_DN, realm, Arrays.stream(realmNames).collect(Collectors.joining(", "))));
-                }
-            }
-        }
-
     }
 }
