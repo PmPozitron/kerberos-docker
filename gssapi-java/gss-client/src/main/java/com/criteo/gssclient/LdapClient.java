@@ -1,6 +1,7 @@
 package com.criteo.gssclient;
 
 import com.google.common.base.MoreObjects;
+import com.sun.security.auth.module.Krb5LoginModule;
 import org.apache.directory.api.i18n.I18n;
 import org.apache.directory.api.ldap.model.cursor.EntryCursor;
 import org.apache.directory.api.ldap.model.message.BindResponse;
@@ -17,6 +18,7 @@ import org.apache.kerby.kerberos.kerb.client.KrbConfigKey;
 import org.apache.kerby.kerberos.kerb.type.ticket.SgtTicket;
 import org.apache.kerby.kerberos.kerb.type.ticket.TgtTicket;
 import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.security.authentication.jaas.memory.InMemoryConfiguration;
 import org.springframework.security.kerberos.client.config.SunJaasKrb5LoginConfig;
 import org.springframework.security.kerberos.client.ldap.KerberosLdapContextSource;
 
@@ -48,6 +50,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class LdapClient {
@@ -82,7 +85,7 @@ public class LdapClient {
         SaslGssApiRequest saslGssApiRequest = new SaslGssApiRequest();
         Configuration configuration = Configuration.getConfiguration();
         saslGssApiRequest.setLoginModuleConfiguration(configuration);
-        saslGssApiRequest.setLoginContextName("client");
+        saslGssApiRequest.setLoginContextName("KerberosLdapContextSource");
         saslGssApiRequest.setMutualAuthentication(true);
         saslGssApiRequest.setRealmName("EXAMPLE.COM");
         saslGssApiRequest.setUsername("pmp");
@@ -93,12 +96,12 @@ public class LdapClient {
         LdapConnectionConfig config = new LdapConnectionConfig();
 
 
-        LdapNetworkConnection connection = new LdapNetworkConnection("desktop-9vij310", 10389, false);
+        LdapNetworkConnection connection = new LdapNetworkConnection("openldap", 1389, false);
 //        connection.startTls();
         BindResponse br = connection.bind(saslGssApiRequest);
         System.out.println(br);
 
-        EntryCursor cursor = connection.search("dc=security,dc=example,dc=com", "(objectclass=*)", SearchScope.SUBTREE);
+        EntryCursor cursor = connection.search("ou=users,dc=example,dc=org", "(objectclass=*)", SearchScope.SUBTREE);
         cursor.forEach(System.out::println);
 
         cursor.close();
@@ -112,7 +115,7 @@ public class LdapClient {
 //        contextSource.setBase("");
 //        contextSource.afterPropertiesSet();
 
-        KerberosLdapContextSource contextSource = new KerberosLdapContextSource("ldap://desktop-9vij310:10389");
+        KerberosLdapContextSource contextSource = new KerberosLdapContextSource("ldap://openldap:1389");
         SunJaasKrb5LoginConfig config = new SunJaasKrb5LoginConfig();
 //        Configuration.Parameters params = config.getParameters();
         config.setDebug(true);
@@ -123,14 +126,29 @@ public class LdapClient {
 
 //        Configuration configuration = Configuration.getConfiguration();
 //        ((ConfigFile)configuration).refresh();
-        contextSource.setLoginConfig(Configuration.getConfiguration());
+        contextSource.setLoginConfig(createJaasConfiguration("pmp@EXAMPLE.COM") );
 
         contextSource.afterPropertiesSet();
 
         LdapTemplate ldapTemplate = new LdapTemplate(contextSource);
-        ldapTemplate.search("dc=security,dc=example,dc=com", "objectclass=*", ctx -> {
+        ldapTemplate.search("ou=users,dc=example,dc=org", "objectclass=*", ctx -> {
             System.out.println(ctx);
         });
+    }
+
+    public static Configuration createJaasConfiguration(String principal) {
+        Map<String, Object> options = new HashMap<>();
+        options.put("principal", principal);
+        options.put("refreshKrb5Config", String.valueOf(true));
+        options.put("debug", String.valueOf(true));
+        options.put("useTicketCache", String.valueOf(true));
+        options.put("ticketCache", ccache.getAbsolutePath());
+
+        AppConfigurationEntry[]entries = new AppConfigurationEntry[]{
+                new AppConfigurationEntry(Krb5LoginModule.class.getName(),
+                AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options)
+        };
+        return new InMemoryConfiguration(entries);
     }
 
     private static void thatTgtAndSgt_areObtained() throws KrbException, IOException {
@@ -140,7 +158,7 @@ public class LdapClient {
         client.init();
 
         TgtTicket tgt = client.requestTgt("pmp", "secret");
-        SgtTicket sgt = client.requestSgt(tgt, "ldap/desktop-9vij310");
+        SgtTicket sgt = client.requestSgt(tgt, "ldap/openldap");
         client.storeTicket(tgt, ccache);
         client.storeTicket(sgt, ccache);
 
